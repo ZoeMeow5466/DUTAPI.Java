@@ -1,0 +1,10 @@
+[Visual Studio Projects]
+.vs/*
+
+[Visual Studio Code]
+.vscode/*
+
+[Java Projects]
+bin/*
+lib/*
+src/main/java/App.java
