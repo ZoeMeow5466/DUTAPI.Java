@@ -2,6 +2,11 @@
 
 This file will list all version log for modified, add or remove function of DUTAPI.
 
+## 1.5
+
+- Chaged variables for Subject Schedue.
+- Schedule Study and Schedule Exam will be independence.
+
 ## 1.4.2
 
 [.NET]

@@ -2,14 +2,14 @@ package io.zoemeow.dutapi.objects;
 
 import java.time.LocalDate;
 
-public class NewsGeneral {
+public class NewsGlobal {
     private Integer id;
     private String title;
     private String content;
     private String contentString;
     public LocalDate date;
 
-    public NewsGeneral() {
+    public NewsGlobal() {
 
     }
 

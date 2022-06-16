@@ -8,7 +8,7 @@ import java.net.CookieManager;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,8 +19,13 @@ import org.jsoup.select.Elements;
 
 import io.zoemeow.dutapi.customhttprequests.HttpRequestParameters;
 import io.zoemeow.dutapi.customhttprequests.HttpRequestString;
-import io.zoemeow.dutapi.objects.SubjectFee;
-import io.zoemeow.dutapi.objects.SubjectInfo;
+import io.zoemeow.dutapi.objects.LessonItem;
+import io.zoemeow.dutapi.objects.ScheduleExam;
+import io.zoemeow.dutapi.objects.ScheduleItem;
+import io.zoemeow.dutapi.objects.ScheduleStudy;
+import io.zoemeow.dutapi.objects.SubjectFeeItem;
+import io.zoemeow.dutapi.objects.SubjectScheduleItem;
+import io.zoemeow.dutapi.objects.WeekItem;
 
 public class Session {
     private final String __VIEWSTATE = "/wEPDwUKMTY2NjQ1OTEyNA8WAh4TVmFsaWRhdGVSZXF1ZXN0TW9kZQIBFgJmD2QWAgIFDxYCHglpbm5lcmh0bWwF/iw8dWwgaWQ" +
@@ -268,12 +273,12 @@ public class Session {
     }
 
     // semester: 1: hk1, 2: hk2, 3: hk he
-    public ArrayList<SubjectInfo> getSubjectsSchedule(Integer year, Integer semester) {
+    public ArrayList<SubjectScheduleItem> getSubjectsSchedule(Integer year, Integer semester) {
         HttpURLConnection client = null;
-        ArrayList<SubjectInfo> result = null;
+        ArrayList<SubjectScheduleItem> result = null;
 
         try {
-            result = new ArrayList<SubjectInfo>();
+            result = new ArrayList<SubjectScheduleItem>();
             String url = "http://sv.dut.udn.vn/WebAjax/evLopHP_Load.aspx?E=TTKBLoad&Code=%d%d%d";
 
             switch (semester) {
@@ -333,19 +338,59 @@ public class Session {
                     if (cellList.size() < 10)
                         continue;
 
-                    SubjectInfo si = new SubjectInfo();
+                    SubjectScheduleItem si = new SubjectScheduleItem();
                     si.setId(cellList.get(1).text());
                     si.setName(cellList.get(2).text());
                     try {
-                        si.setCredit(Float.parseFloat(cellList.get(3).text()));
+                        si.setCredit(Integer.parseInt(cellList.get(3).text()));
                     } catch (Exception ex) {
-                        si.setCredit(0F);
+                        si.setCredit(0);
                     }
                     si.setIsHighQuality(cellList.get(5).attr("class").contains("GridCheck"));
                     si.setLecturer(cellList.get(6).text());
-                    si.setScheduleStudy(cellList.get(7).text());
-                    si.setWeeks(cellList.get(8).text());
-                    si.setPointFomula(cellList.get(10).text());
+                    
+                    // Set schedule study here!
+                    ScheduleStudy scheduleStudy = new ScheduleStudy();
+                    
+                    if (!cellList.get(7).text().isBlank() && !cellList.get(7).text().isEmpty()) {
+                        String[] cellSplit = cellList.get(7).text().split("; ");
+                        for (String cellSplitItem: cellSplit) {
+                            ScheduleItem scheduleItem = new ScheduleItem();
+                            // Set day of week
+                            if (cellSplitItem.toUpperCase().contains("CN")) {
+                                scheduleItem.setDayOfWeek(0);
+                            } else {
+                                scheduleItem.setDayOfWeek(Integer.parseInt(cellSplitItem.split(",")[0].split(" ")[1]) - 1);
+                            }
+                            // Set lesson
+                            LessonItem lessonItem = new LessonItem();
+                            lessonItem.setStart(Integer.parseInt(cellSplitItem.split(",")[1].split("-")[0]));
+                            lessonItem.setEnd(Integer.parseInt(cellSplitItem.split(",")[1].split("-")[1]));
+                            scheduleItem.setLesson(lessonItem);
+                            // Set room
+                            scheduleItem.setRoom(cellSplitItem.split(",")[2]);
+                            // Add to schedule list.
+                            scheduleStudy.getScheduleList().add(scheduleItem);
+                        }
+                    }
+
+                    // Set schedule study week list.
+                    if (!cellList.get(8).text().isBlank() && !cellList.get(8).text().isEmpty()) {
+                        String[] cellSplit = cellList.get(8).text().split(";");
+                        for (String cellSplitItem: cellSplit) {
+                            WeekItem weekItem = new WeekItem();
+                            weekItem.setStart(Integer.parseInt(cellSplitItem.split("-")[0]));
+                            weekItem.setEnd(Integer.parseInt(cellSplitItem.split("-")[1]));
+                            scheduleStudy.getWeekList().add(weekItem);
+                        }
+                    }
+                    
+                    // Add to subject schedule item.
+                    si.setSubjectStudy(scheduleStudy);
+
+                    // si.setScheduleStudy(cellList.get(7).text());
+                    // si.setWeeks(cellList.get(8).text());
+                    si.setPointFormula(cellList.get(10).text());
 
                     result.add(si);
                 }
@@ -361,49 +406,55 @@ public class Session {
                     if (cellList.size() < 5)
                         continue;
 
-                    SubjectInfo si = result.stream()
-                        .filter(s -> s.getId() == cellList.get(1).text())
+                    SubjectScheduleItem si = result.stream()
+                        .filter(s -> s.getId().equals(cellList.get(1).text()))
                         .findFirst()
                         .orElse(null);
                     
+                    // TODO: Set subject examination here!
                     if (si != null) {
-                        si.setGroupExam(cellList.get(3).text());
-                        si.setIsGlobalExam(Boolean.parseBoolean(cellList.get(4).text()));
-                        si.setDateExamInString(cellList.get(5).text());
-
-                        if (si.getDateExamInString() != null) {
-                            String[] splitted = si.getDateExamInString().split(", " );
-                            String time = null;
-                            for (Integer i = 0; i < splitted.length; i++) {
-                                switch (splitted[i].split(", ")[1]) {
-                                    case "Phòng":
-                                        si.setRoomExam(splitted[i].split(": ")[1]);
-                                        break;
-                                    case "Ngày":
-                                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-                                        si.setDateExam(LocalDateTime.parse(splitted[i].split(": ")[1], formatter));
-                                        break;
-                                    case "Giờ":
-                                        time = splitted[i].split(": ")[1];
-                                        break;
-                                    default:
-                                        break;
+                        ScheduleExam scheduleExam = new ScheduleExam();
+                        // Set group
+                        scheduleExam.setGroup(cellList.get(3).text());
+                        // Set is global
+                        scheduleExam.setIsGlobal(cellList.get(4).attr("class").contains("GridCheck"));
+                        // TODO: Date + ROOM
+                        String temp = cellList.get(5).text();
+                        String[] tempSplitted = temp.split(", ");
+                        LocalDateTime localDateTime = LocalDateTime.of(2000, 1, 1, 0, 0);
+                        for (String tempSplittedItem: tempSplitted) {
+                            String[] itemSplitted = tempSplittedItem.split(": ");
+                            // Area for day
+                            if (tempSplittedItem.contains("Ngày")) {
+                                try {
+                                    String[] dateSplitted = itemSplitted[1].split("/");
+                                    localDateTime = LocalDateTime.of(
+                                        Integer.parseInt(dateSplitted[2]),
+                                        Integer.parseInt(dateSplitted[1]),
+                                        Integer.parseInt(dateSplitted[0]),
+                                        0, 0, 0
+                                    );
+                                }
+                                catch (Exception ex) {
+                                    ex.printStackTrace();
                                 }
                             }
-
-                            if (si.getDateExam() != null && time != null) {
-                                si.setDateExam(si.getDateExam().plusHours(Integer.parseInt(time.split("h")[0])));
-                                if (time.split("h").length == 2) {
-                                    Integer mInteger = 0;
-                                    try {
-                                        mInteger = Integer.parseInt(time.split("h")[1]);
-                                    } catch (Exception ex) {
-                                        mInteger = 0;
-                                    }
-                                    si.setDateExam(si.getDateExam().plusMinutes(mInteger));
-                                }
+                            // Area for room
+                            else if (tempSplittedItem.contains("Phòng")) {
+                                scheduleExam.setRoom(itemSplitted[1]);
+                            }
+                            // Area for hours
+                            else if (tempSplittedItem.contains("Giờ")) {
+                                String[] timeSplitted = itemSplitted[1].split("h");
+                                if (timeSplitted.length > 0)
+                                    localDateTime = localDateTime.plusHours(Integer.parseInt(timeSplitted[0]) - 7);
+                                if (timeSplitted.length > 1)
+                                    localDateTime = localDateTime.plusMinutes(Integer.parseInt(timeSplitted[1]));
                             }
                         }
+                        // Set date
+                        scheduleExam.setDate(localDateTime.toEpochSecond(ZoneOffset.UTC) * 1000);
+                        si.setSubjectExam(scheduleExam);
                     }
                 }
             }
@@ -418,12 +469,12 @@ public class Session {
         return result;
     }
 
-    public ArrayList<SubjectFee> getSubjectsFee(Integer year, Integer semester) {
-        ArrayList<SubjectFee> result = null;
+    public ArrayList<SubjectFeeItem> getSubjectsFee(Integer year, Integer semester) {
+        ArrayList<SubjectFeeItem> result = null;
         HttpURLConnection client = null;
 
         try {
-            result = new ArrayList<SubjectFee>();
+            result = new ArrayList<SubjectFeeItem>();
 
             String url = "http://sv.dut.udn.vn/WebAjax/evLopHP_Load.aspx?E=THPhiLoad&Code=%d%d%d";
 
@@ -483,22 +534,22 @@ public class Session {
                     if (cellList.size() < 10)
                         continue;
 
-                    SubjectFee sf = new SubjectFee();
+                    SubjectFeeItem sf = new SubjectFeeItem();
                     sf.setId(cellList.get(1).text());
                     sf.setName(cellList.get(2).text());
                     try {
-                        sf.setCredit(Float.parseFloat(cellList.get(3).text()));
+                        sf.setCredit(Integer.parseInt(cellList.get(3).text()));
                     } catch (Exception ex) {
-                        sf.setCredit(0F);
+                        sf.setCredit(0);
                     }
-                    sf.setIsQuality(cellList.get(4).attr("class").contains("GridCheck"));
+                    sf.setIsHighQuality(cellList.get(4).attr("class").contains("GridCheck"));
                     try {
                         sf.setPrice(Double.parseDouble(cellList.get(5).text().replace(",", "")));
                     } catch (Exception ex) {
                         sf.setPrice(0.0);
                     }
                     sf.setDebt(cellList.get(6).attr("class").contains("GridCheck"));
-                    sf.setIsReStudy(cellList.get(7).attr("class").contains("GridCheck"));
+                    sf.setIsRestudy(cellList.get(7).attr("class").contains("GridCheck"));
                     sf.setVerifiedPaymentAt(cellList.get(8).text());
                     result.add(sf);
                 }
@@ -513,5 +564,4 @@ public class Session {
 
         return result;
     }
-
 }
