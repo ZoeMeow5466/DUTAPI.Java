@@ -13,20 +13,20 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import io.zoemeow.dutapi.objects.NewsGeneral;
+import io.zoemeow.dutapi.objects.NewsGlobal;
 import io.zoemeow.dutapi.objects.NewsType;
 
 public class News {
-    public static ArrayList<NewsGeneral> getNews(NewsType newsType, Integer page) {
-        ArrayList<NewsGeneral> newsList = null;
+    public static ArrayList<NewsGlobal> getNews(NewsType newsType, Integer page) {
+        ArrayList<NewsGlobal> newsList = null;
         HttpURLConnection client = null;
         
         try {
-            newsList = new ArrayList<NewsGeneral>();
+            newsList = new ArrayList<NewsGlobal>();
             String url = "http://sv.dut.udn.vn/WebAjax/evLopHP_Load.aspx?E=%s&PAGETB=%d&COL=TieuDe&NAME=&TAB=0";
 
             switch (newsType) {
-                case General:
+                case Global:
                     url = String.format(url, "CTRTBSV", page);
                     break;
                 case Subject:
@@ -61,7 +61,7 @@ public class News {
             // News General + News Subject
             Elements tbbox = webData.getElementsByClass("tbbox");
             for (Element tb1: tbbox) {
-                NewsGeneral newsGeneralItem = new NewsGeneral();
+                NewsGlobal newsGeneralItem = new NewsGlobal();
 
                 Element title = tb1.getElementsByClass("tbBoxCaption").get(0);
                 String[] titleTemp = title.text().split(": ");

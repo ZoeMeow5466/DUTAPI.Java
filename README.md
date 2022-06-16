@@ -35,9 +35,10 @@ Wiki, or manual for how-to-use?
 
 ## Latest change log
 
-Version 1.4.2
-[.NET]
-- Optimize code line.
+Version 1.5
+
+- Chaged variables for Subject Schedue.
+- Schedule Study and Schedule Exam will be independence.
 
 [Click here](CHANGELOG.md) for all log versions.
 
