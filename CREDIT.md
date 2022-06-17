@@ -1,6 +1,12 @@
 # CREDIT
 
-### Jsoup
+## Gradle
+
+Gradle build tool source code is open-source and licensed under the Apache License 2.0. You can view this license by [click here](https://github.com/gradle/gradle/blob/master/LICENSE).
+
+Gradle user manual and DSL reference manual are licensed under [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](http://creativecommons.org/licenses/by-nc-sa/4.0/).
+
+## Jsoup
 
 The MIT License
 

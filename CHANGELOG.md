@@ -2,6 +2,10 @@
 
 This file will list all version log for modified, add or remove function of DUTAPI.
 
+## 1.5.1
+
+- Switched to Gradle.
+
 ## 1.5
 
 - Chaged variables for Subject Schedue.

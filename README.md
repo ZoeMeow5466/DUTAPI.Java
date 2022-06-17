@@ -35,10 +35,9 @@ Wiki, or manual for how-to-use?
 
 ## Latest change log
 
-Version 1.5
+Version 1.5.1
 
-- Chaged variables for Subject Schedue.
-- Schedule Study and Schedule Exam will be independence.
+- Switched to Gradle.
 
 [Click here](CHANGELOG.md) for all log versions.
 
