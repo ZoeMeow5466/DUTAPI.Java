@@ -2,6 +2,8 @@
 
 This library provides API (for this repository - crawl data from a page) for access for some features in [DUT Student page - Da Nang University of Technology](http://sv.dut.udn.vn). For Java programming language.
 
+![https://github.com/ZoeMeow5466/DUTAPI.Java/releases/latest](https://img.shields.io/github/v/release/ZoeMeow5466/DUTAPI.Java?style=for-the-badge)
+
 ## Requirements for Java:
 
 - JDK (tested with Eclipse Temurin JDK with Hotspot v17.0.2).
