@@ -2,6 +2,7 @@ package io.zoemeow.dutapi;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.CookieHandler;
 import java.net.CookieManager;
@@ -19,6 +20,7 @@ import org.jsoup.select.Elements;
 
 import io.zoemeow.dutapi.customhttprequests.HttpRequestParameters;
 import io.zoemeow.dutapi.customhttprequests.HttpRequestString;
+import io.zoemeow.dutapi.objects.AccountInformation;
 import io.zoemeow.dutapi.objects.LessonItem;
 import io.zoemeow.dutapi.objects.ScheduleExam;
 import io.zoemeow.dutapi.objects.ScheduleItem;
@@ -208,28 +210,17 @@ public class Session {
         return result;
     }
 
+    /**
+     * Logout your account from Session ID.
+     * @return if logged out, return true, Otherwise, return false.
+     */
     public Boolean logout() {
-        HttpURLConnection client = null;
         Boolean result = false;
 
         try {
-            URL url = new URL("http://sv.dut.udn.vn/PageLogout.aspx");
-            client = (HttpURLConnection) url.openConnection();
+            String url = "http://sv.dut.udn.vn/PageLogout.aspx";
 
-            // Set cookie
-            List<String> cookieTemp = getCookies();
-            if (cookieTemp != null) {
-                for (String cookie : cookieTemp) {
-                    client.addRequestProperty("Set-Cookie", cookie.split(";", 1)[0]);
-                }
-            }
-
-            client.connect();
-
-            // Set cookie and disconnect
-            setCookies(client.getHeaderFields().get("Set-Cookie"));
-            client.disconnect();
-
+            this.getWebContentFromUrl(url);
             result = !isLoggedIn();
         }
         catch (Exception ex) {
@@ -240,29 +231,18 @@ public class Session {
         return result;
     }
 
+    /**
+     * Check if you logged in.
+     * @return If logged in, return true. Otherwise, return false.
+     */
     public Boolean isLoggedIn() {
-        HttpURLConnection client = null;
         Boolean result = false;
 
         try {
-            URL url = new URL("http://sv.dut.udn.vn/WebAjax/evLopHP_Load.aspx?E=TTKBLoad&Code=2110");
-            client = (HttpURLConnection) url.openConnection();
+            String url = "http://sv.dut.udn.vn/WebAjax/evLopHP_Load.aspx?E=TTKBLoad&Code=2110";
 
-            // Set cookie
-            List<String> cookieTemp = getCookies();
-            if (cookieTemp != null) {
-                for (String cookie : cookieTemp) {
-                    client.addRequestProperty("Set-Cookie", cookie.split(";", 1)[0]);
-                }
-            }
-
-            client.connect();
-            if (client.getResponseCode() == 200 || client.getResponseCode() == 204)
-                result = true;
-
-            // Set cookie and disconnect
-            setCookies(client.getHeaderFields().get("Set-Cookie"));
-            client.disconnect();
+            this.getWebContentFromUrl(url);
+            result = true;
         }
         catch (Exception ex) {
             ex.printStackTrace();
@@ -272,9 +252,13 @@ public class Session {
         return result;
     }
 
-    // semester: 1: hk1, 2: hk2, 3: hk he
+    /**
+     * Get subject schedule list from sv.dut.udn.vn.
+     * @param year School year (ex. 21 for 2021-2022)
+     * @param semester School semester (1 for semseter 1, 2 for semester 2, 3 for in summer)
+     * @return A list with your subjects schedule.
+     */
     public ArrayList<SubjectScheduleItem> getSubjectsSchedule(Integer year, Integer semester) {
-        HttpURLConnection client = null;
         ArrayList<SubjectScheduleItem> result = null;
 
         try {
@@ -294,39 +278,10 @@ public class Session {
                     throw new Exception();
             }
 
-            URL url2 = new URL(url);
-            client = (HttpURLConnection) url2.openConnection();
-
-            // Set cookie
-            List<String> cookieTemp = getCookies();
-            if (cookieTemp != null) {
-                for (String cookie : cookieTemp) {
-                    client.addRequestProperty("Set-Cookie", cookie.split(";", 1)[0]);
-                }
-            }
-            client.connect();
-
-            // TODO: Set exception name here!
-            if (client.getResponseCode() != 200 && client.getResponseCode() != 204)
-                throw new Exception("hello =))");
-
-            // https://stackoverflow.com/questions/8616781/how-to-get-a-web-pages-source-code-from-java
-            String inputLine;
-            StringBuilder stringBuilder = new StringBuilder();
-            try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(client.getInputStream(), "UTF-8")))
-            {
-                while ((inputLine = bufferedReader.readLine()) != null)
-                {
-                    stringBuilder.append(inputLine);
-                }
-            }
-
-            // Set cookie and disconnect
-            setCookies(client.getHeaderFields().get("Set-Cookie"));
-            client.disconnect();
-
+            String webHTML = this.getWebContentFromUrl(url);
+            
             // Processing here
-            Document webData = Jsoup.parse(stringBuilder.toString());
+            Document webData = Jsoup.parse(webHTML.toString());
 
             // Schedule study
             Element schStudy = webData.getElementById("TTKB_GridInfo");
@@ -388,10 +343,10 @@ public class Session {
                     // Add to subject schedule item.
                     si.setSubjectStudy(scheduleStudy);
 
-                    // si.setScheduleStudy(cellList.get(7).text());
-                    // si.setWeeks(cellList.get(8).text());
+                    // Set subject point formula.
                     si.setPointFormula(cellList.get(10).text());
 
+                    // Add to result
                     result.add(si);
                 }
             }
@@ -411,19 +366,22 @@ public class Session {
                         .findFirst()
                         .orElse(null);
                     
-                    // TODO: Set subject examination here!
+                    // Set subject examination here!
                     if (si != null) {
                         ScheduleExam scheduleExam = new ScheduleExam();
                         // Set group
                         scheduleExam.setGroup(cellList.get(3).text());
                         // Set is global
                         scheduleExam.setIsGlobal(cellList.get(4).attr("class").contains("GridCheck"));
-                        // TODO: Date + ROOM
+                        // Date + Room
                         String temp = cellList.get(5).text();
                         String[] tempSplitted = temp.split(", ");
                         LocalDateTime localDateTime = LocalDateTime.of(2000, 1, 1, 0, 0);
                         for (String tempSplittedItem: tempSplitted) {
                             String[] itemSplitted = tempSplittedItem.split(": ");
+                            if (itemSplitted.length < 2)
+                                continue;
+
                             // Area for day
                             if (tempSplittedItem.contains("Ngày")) {
                                 try {
@@ -460,6 +418,7 @@ public class Session {
             }
         }
         catch (Exception ex) {
+            ex.printStackTrace();
             if (result != null) {
                 result.clear();
                 result = null;
@@ -469,9 +428,14 @@ public class Session {
         return result;
     }
 
+    /**
+     * Get subject fee list from sv.dut.udn.vn.
+     * @param year School year (ex. 21 for 2021-2022)
+     * @param semester School semester (1 for semseter 1, 2 for semester 2, 3 for in summer)
+     * @return A list with your subjects fee.
+     */
     public ArrayList<SubjectFeeItem> getSubjectsFee(Integer year, Integer semester) {
         ArrayList<SubjectFeeItem> result = null;
-        HttpURLConnection client = null;
 
         try {
             result = new ArrayList<SubjectFeeItem>();
@@ -491,39 +455,10 @@ public class Session {
                     throw new Exception();
             }
 
-            URL url2 = new URL(url);
-            client = (HttpURLConnection) url2.openConnection();
-
-            // Set cookie
-            List<String> cookieTemp = getCookies();
-            if (cookieTemp != null) {
-                for (String cookie : cookieTemp) {
-                    client.addRequestProperty("Set-Cookie", cookie.split(";", 1)[0]);
-                }
-            }
-            client.connect();
-
-            // TODO: Set exception name here!
-            if (client.getResponseCode() != 200 && client.getResponseCode() != 204)
-                throw new Exception("hello =))");
-
-            // https://stackoverflow.com/questions/8616781/how-to-get-a-web-pages-source-code-from-java
-            String inputLine;
-            StringBuilder stringBuilder = new StringBuilder();
-            try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(client.getInputStream(), "UTF-8")))
-            {
-                while ((inputLine = bufferedReader.readLine()) != null)
-                {
-                    stringBuilder.append(inputLine);
-                }
-            }
-
-            // Set cookie and disconnect
-            setCookies(client.getHeaderFields().get("Set-Cookie"));
-            client.disconnect();
-
+            String webHTML = this.getWebContentFromUrl(url);
+            
             // Processing here
-            Document webData = Jsoup.parse(stringBuilder.toString());
+            Document webData = Jsoup.parse(webHTML.toString());
 
             Element schFee = webData.getElementById("THocPhi_GridInfo");
             Elements schFeeList = schFee.getElementsByClass("GridRow");
@@ -556,6 +491,7 @@ public class Session {
             }
         }
         catch (Exception ex) {
+            ex.printStackTrace();
             if (result != null) {
                 result.clear();
                 result = null;
@@ -563,5 +499,123 @@ public class Session {
         }
 
         return result;
+    }
+
+    /**
+     * Get account information in your account from sv.dut.udn.vn.
+     * @return Account information.
+     */
+    public AccountInformation getAccountInformation() {
+        AccountInformation result = null;
+
+        try {
+            result = new AccountInformation();
+            String url = "http://sv.dut.udn.vn/PageCaNhan.aspx";
+            
+            String webHTML = this.getWebContentFromUrl(url);
+            
+            // Processing here
+            Document webData = Jsoup.parse(webHTML.toString());
+
+            result.setName(extFunc.getValueByID(webData, "CN_txtHoTen"));
+            result.setDateofBirth(extFunc.getValueByID(webData, "CN_txtNgaySinh"));
+            result.setBirthPlace(extFunc.getValueFromComboBoxByID(webData, "CN_cboNoiSinh"));
+            result.setGender(extFunc.getValueByID(webData, "CN_txtGioiTinh"));
+            result.setEthnicity(extFunc.getValueFromComboBoxByID(webData, "CN_cboDanToc"));
+            result.setNationality(extFunc.getValueFromComboBoxByID(webData, "CN_cboQuocTich"));
+            result.setNationalIdCard(extFunc.getValueByID(webData, "CN_txtSoCMND"));
+            result.setNationalIdCardIssueDate(extFunc.getValueByID(webData, "CN_txtNgayCap"));
+            result.setNationalIdCardIssuePlace(extFunc.getValueFromComboBoxByID(webData, "CN_cboNoiCap"));
+            result.setCitizenIdCard(extFunc.getValueByID(webData, "CN_txtSoCCCD"));
+            result.setCitizenIdCardIssueDate(extFunc.getValueByID(webData, "CN_txtNcCCCD"));
+            result.setReligion(extFunc.getValueFromComboBoxByID(webData, "CN_cboTonGiao"));
+            result.setAccountBankId(extFunc.getValueByID(webData, "CN_txtTKNHang"));
+            result.setAccountBankName(extFunc.getValueByID(webData, "CN_txtNgHang"));
+            result.sethIId(extFunc.getValueByID(webData, "CN_txtSoBHYT"));
+            result.sethIExpireDate(extFunc.getValueByID(webData, "CN_txtHanBHYT"));
+            result.setSpecialization(extFunc.getValueByID(webData, "MainContent_CN_txtNganh"));
+            result.setSchoolClass(extFunc.getValueByID(webData, "CN_txtLop"));
+            result.setTrainingProgramPlan(extFunc.getValueByID(webData, "MainContent_CN_txtCTDT"));
+            result.setTrainingProgramPlan2(extFunc.getValueByID(webData, "MainContent_CN_txtCT2"));
+            result.setSchoolEmail(extFunc.getValueByID(webData, "CN_txtMail1"));
+            result.setPersonalEmail(extFunc.getValueByID(webData, "CN_txtMail2"));
+            result.setSchoolEmailInitPass(extFunc.getValueByID(webData, "CN_txtMK365"));
+            result.setFacebookUrl(extFunc.getValueByID(webData, "CN_txtFace"));
+            result.setPhoneNumber(extFunc.getValueByID(webData, "CN_txtPhone"));
+            result.setAddress(extFunc.getValueByID(webData, "CN_txtCuTru"));
+            result.setAddressFrom(extFunc.getValueFromComboBoxByID(webData, "CN_cboDCCua"));
+            result.setAddressCity(extFunc.getValueFromComboBoxByID(webData, "CN_cboTinhCTru"));
+            result.setAddressDistrict(extFunc.getValueFromComboBoxByID(webData, "CN_cboQuanCTru"));
+            result.setAddressSubDistrict(extFunc.getValueFromComboBoxByID(webData, "CN_divPhuongCTru"));
+
+            String temp = webData.getElementById("Main_lblHoTen").text();
+            result.setStudentId(temp.substring(temp.indexOf("(") + 1, temp.indexOf(")")));
+        }
+        catch (Exception ex) {
+            if (result != null)
+                result = null;
+            ex.printStackTrace();
+        }
+
+        return result;
+    }
+
+    interface SessionExternalFunction {
+        String getValueByID(Document webData, String elementId);
+        String getValueFromComboBoxByID(Document webData, String elementId);
+    }
+
+    private SessionExternalFunction extFunc = new SessionExternalFunction() {
+        public String getValueByID(Document webData, String elementId) {
+            return webData.getElementById(elementId).val().length() > 0 ? webData.getElementById(elementId).val() : null;
+        }
+
+        // https://stackoverflow.com/a/22929670
+        public String getValueFromComboBoxByID(Document webData, String elementId) {
+            String result = null;
+            Elements options = webData.getElementById(elementId).children();
+            for (Element option : options) {
+                if (option.hasAttr("selected")) {
+                    result = option.text();
+                    break;
+                }
+            }
+
+            return result;
+        }
+    };
+
+    private String getWebContentFromUrl(String url) throws Exception, IOException {
+        URL urlItem = new URL(url);
+        HttpURLConnection client = (HttpURLConnection) urlItem.openConnection();
+
+        // Set cookie from local
+        List<String> cookieTemp = getCookies();
+        if (cookieTemp != null) {
+            for (String cookie : cookieTemp) {
+                client.addRequestProperty("Set-Cookie", cookie.split(";", 1)[0]);
+            }
+        }
+
+        // Get web content
+        client.connect();
+
+        if (client.getResponseCode() != 200 && client.getResponseCode() != 204)
+            throw new Exception("Server returned response code " + client.getResponseCode());
+
+        // https://stackoverflow.com/questions/8616781/how-to-get-a-web-pages-source-code-from-java
+        String inputLine;
+        StringBuilder stringBuilder = new StringBuilder();
+        try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(client.getInputStream(), "UTF-8"))) {
+            while ((inputLine = bufferedReader.readLine()) != null) {
+                stringBuilder.append(inputLine);
+            }
+        }
+
+        // Set cookie to local and disconnect
+        setCookies(client.getHeaderFields().get("Set-Cookie"));
+        client.disconnect();
+
+        return stringBuilder.toString();
     }
 }
