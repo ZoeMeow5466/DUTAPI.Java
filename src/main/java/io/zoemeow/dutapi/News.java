@@ -13,6 +13,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import io.zoemeow.dutapi.objects.LinkItem;
 import io.zoemeow.dutapi.objects.NewsGlobal;
 import io.zoemeow.dutapi.objects.NewsType;
 
@@ -61,7 +62,7 @@ public class News {
             // News General + News Subject
             Elements tbbox = webData.getElementsByClass("tbbox");
             for (Element tb1: tbbox) {
-                NewsGlobal newsGeneralItem = new NewsGlobal();
+                NewsGlobal newsItem = new NewsGlobal();
 
                 Element title = tb1.getElementsByClass("tbBoxCaption").get(0);
                 String[] titleTemp = title.text().split(": ");
@@ -69,17 +70,34 @@ public class News {
 
                 if (titleTemp.length == 2) {
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-                    newsGeneralItem.setDate(LocalDate.parse(titleTemp[0], formatter));
-                    newsGeneralItem.setTitle(titleTemp[1]);
+                    newsItem.setDate(LocalDate.parse(titleTemp[0], formatter));
+                    newsItem.setTitle(titleTemp[1]);
                 }
                 else {
-                    newsGeneralItem.setTitle(title.text());
+                    newsItem.setTitle(title.text());
                 }
 
-                newsGeneralItem.setContent(content.html());
-                newsGeneralItem.setContentString(content.text());
+                newsItem.setContent(content.html());
+                newsItem.setContentString(content.text());
                 
-                newsList.add(newsGeneralItem);
+                // Find links and set to item
+                ArrayList<LinkItem> links = new ArrayList<>();
+                Integer position = 0;
+                String temp1 = content.text();
+                Elements temp2 = content.getElementsByTag("a");
+                for (Element item: temp2) {
+                    if (temp1.contains(item.text())) {
+                        position = position + temp1.indexOf(item.text());
+                        links.add(new LinkItem(
+                            item.text(),
+                            item.attr("abs:href"),
+                            position
+                        ));
+                    }
+                }
+                newsItem.setLinks(links);
+
+                newsList.add(newsItem);
             }
         }
         catch (Exception ex) {
