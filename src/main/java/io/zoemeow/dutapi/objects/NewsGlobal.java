@@ -1,13 +1,15 @@
 package io.zoemeow.dutapi.objects;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 public class NewsGlobal {
     private Integer id;
     private String title;
     private String content;
     private String contentString;
-    public LocalDate date;
+    private LocalDate date;
+    private ArrayList<LinkItem> links;
 
     public NewsGlobal() {
 
@@ -51,5 +53,13 @@ public class NewsGlobal {
 
     public void setDate(LocalDate date) {
         this.date = date;
+    }
+
+    public ArrayList<LinkItem> getLinks() {
+        return links;
+    }
+
+    public void setLinks(ArrayList<LinkItem> links) {
+        this.links = links;
     }
 }
