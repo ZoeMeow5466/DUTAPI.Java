@@ -2,7 +2,7 @@ package io.zoemeow.dutapi.objects;
 
 public class AccountInformation {
     private String name;
-    private String dateofBirth;
+    private String dateOfBirth;
     private String birthPlace;
     private String gender;
     private String ethnicity;
@@ -37,46 +37,6 @@ public class AccountInformation {
 
     }
 
-    public AccountInformation(String name, String dateofBirth, String birthPlace, String gender, String ethnicity,
-            String nationality, String nationalIdCard, String nationalIdCardIssueDate, String nationalIdCardIssuePlace,
-            String citizenIdCard, String citizenIdCardIssueDate, String religion, String accountBankId,
-            String accountBankName, String hIId, String hIExpireDate, String specialization, String schoolClass,
-            String trainingProgramPlan, String trainingProgramPlan2, String schoolEmail, String personalEmail,
-            String schoolEmailInitPass, String facebookUrl, String phoneNumber, String address, String addressFrom,
-            String addressCity, String addressDistrict, String addressSubDistrict, String studentId) {
-        this.name = name;
-        this.dateofBirth = dateofBirth;
-        this.birthPlace = birthPlace;
-        this.gender = gender;
-        this.ethnicity = ethnicity;
-        this.nationality = nationality;
-        this.nationalIdCard = nationalIdCard;
-        this.nationalIdCardIssueDate = nationalIdCardIssueDate;
-        this.nationalIdCardIssuePlace = nationalIdCardIssuePlace;
-        this.citizenIdCard = citizenIdCard;
-        this.citizenIdCardIssueDate = citizenIdCardIssueDate;
-        this.religion = religion;
-        this.accountBankId = accountBankId;
-        this.accountBankName = accountBankName;
-        this.hIId = hIId;
-        this.hIExpireDate = hIExpireDate;
-        this.specialization = specialization;
-        this.schoolClass = schoolClass;
-        this.trainingProgramPlan = trainingProgramPlan;
-        this.trainingProgramPlan2 = trainingProgramPlan2;
-        this.schoolEmail = schoolEmail;
-        this.personalEmail = personalEmail;
-        this.schoolEmailInitPass = schoolEmailInitPass;
-        this.facebookUrl = facebookUrl;
-        this.phoneNumber = phoneNumber;
-        this.address = address;
-        this.addressFrom = addressFrom;
-        this.addressCity = addressCity;
-        this.addressDistrict = addressDistrict;
-        this.addressSubDistrict = addressSubDistrict;
-        this.studentId = studentId;
-    }
-
     public String getName() {
         return name;
     }
@@ -85,12 +45,12 @@ public class AccountInformation {
         this.name = name;
     }
 
-    public String getDateofBirth() {
-        return dateofBirth;
+    public String getDateOfBirth() {
+        return dateOfBirth;
     }
 
-    public void setDateofBirth(String dateofBirth) {
-        this.dateofBirth = dateofBirth;
+    public void setDateOfBirth(String dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
     }
 
     public String getBirthPlace() {
@@ -189,19 +149,19 @@ public class AccountInformation {
         this.accountBankName = accountBankName;
     }
 
-    public String gethIId() {
+    public String getHIId() {
         return hIId;
     }
 
-    public void sethIId(String hIId) {
+    public void setHIId(String hIId) {
         this.hIId = hIId;
     }
 
-    public String gethIExpireDate() {
+    public String getHIExpireDate() {
         return hIExpireDate;
     }
 
-    public void sethIExpireDate(String hIExpireDate) {
+    public void setHIExpireDate(String hIExpireDate) {
         this.hIExpireDate = hIExpireDate;
     }
 

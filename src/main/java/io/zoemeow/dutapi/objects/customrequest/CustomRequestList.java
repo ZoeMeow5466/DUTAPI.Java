@@ -1,25 +1,25 @@
-package io.zoemeow.dutapi.customhttprequests;
+package io.zoemeow.dutapi.objects.customrequest;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 
-public class HttpRequestString {
-    ArrayList<HttpRequestParameters> httpRequestParameters = null;
+public class CustomRequestList {
+    ArrayList<CustomRequestItem> httpRequestParameters = null;
 
-    public HttpRequestString() {
-        this.httpRequestParameters = new ArrayList<HttpRequestParameters>();
+    public CustomRequestList() {
+        this.httpRequestParameters = new ArrayList<CustomRequestItem>();
     }
 
-    public HttpRequestString(ArrayList<HttpRequestParameters> array) {
+    public CustomRequestList(ArrayList<CustomRequestItem> array) {
         this.httpRequestParameters = array;
     }
 
-    public void addRequest(HttpRequestParameters param) {
+    public void addRequest(CustomRequestItem param) {
         this.httpRequestParameters.add(param);
     }
 
-    public HttpRequestParameters getRequests(int position) {
+    public CustomRequestItem getRequests(int position) {
         return this.httpRequestParameters.get(position);
     }
 
@@ -39,7 +39,7 @@ public class HttpRequestString {
         if (httpRequestParameters == null)
             throw new NullPointerException("HttpRequestParameters is null!");
 
-        for (HttpRequestParameters item : httpRequestParameters) {
+        for (CustomRequestItem item : httpRequestParameters) {
             if (!first)
                 request += "&";
             else first = false;

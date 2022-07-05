@@ -1,12 +1,12 @@
-package io.zoemeow.dutapi.customhttprequests;
+package io.zoemeow.dutapi.objects.customrequest;
 
-public class HttpRequestParameters {
+public class CustomRequestItem {
     private String name = null;
     private String value = null;
 
-    public HttpRequestParameters() { }
+    public CustomRequestItem() { }
 
-    public HttpRequestParameters(String name, String value) {
+    public CustomRequestItem(String name, String value) {
         this.name = name;
         this.value = value;
     }
