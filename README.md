@@ -38,6 +38,10 @@ Wiki, or manual for how-to-use?
 
 ## Latest change log
 
+Version 1.6.1
+
+- Fix critical error.
+
 Version 1.6.0
 
 - Move from VS Code to Intellij IDEA.

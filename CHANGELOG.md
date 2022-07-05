@@ -2,13 +2,17 @@
 
 This file will list all version log for modified, add or remove function of DUTAPI.
 
+## 1.6.1
+
+- Fix critical error.
+
 ## 1.6.0
 
 - Move from VS Code to Intellij IDEA.
 - Migrate with old commits.
 - Rename from Session to Accounts and Major changes for Accounts.
 - Used OkHttp3.
-- 
+
 ## 1.5.1
 
 - Switched to Gradle.
