@@ -10,7 +10,8 @@ This library provides API (for this repository - crawl data from a page) for acc
 
 ## Using libraries:
 
-- [Jsoup (tested v1.14.3)](https://jsoup.org/)
+- [Jsoup](https://jsoup.org/)
+- [OkHttp3](https://square.github.io/okhttp/)
 
 ## License
 
