@@ -15,7 +15,7 @@ public class SubjectFeeItem {
     }
 
     public SubjectFeeItem(String id, String name, Integer credit, Boolean isHighQuality, Double price, Boolean debt,
-            Boolean isRestudy, String verifiedPaymentAt) {
+                          Boolean isRestudy, String verifiedPaymentAt) {
         this.id = id;
         this.name = name;
         this.credit = credit;

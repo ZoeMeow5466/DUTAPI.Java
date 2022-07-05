@@ -15,7 +15,7 @@ public class SubjectScheduleItem {
     }
 
     public SubjectScheduleItem(String id, String name, Integer credit, Boolean isHighQuality,
-            ScheduleStudy subjectStudy, ScheduleExam subjectExam) {
+                               ScheduleStudy subjectStudy, ScheduleExam subjectExam) {
         this.id = id;
         this.name = name;
         this.credit = credit;

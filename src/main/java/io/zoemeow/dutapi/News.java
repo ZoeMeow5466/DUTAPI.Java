@@ -1,115 +1,81 @@
 package io.zoemeow.dutapi;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-
+import io.zoemeow.dutapi.objects.customrequest.CustomResponse;
+import io.zoemeow.dutapi.objects.LinkItem;
+import io.zoemeow.dutapi.objects.NewsGlobalItem;
+import io.zoemeow.dutapi.objects.NewsType;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import io.zoemeow.dutapi.objects.LinkItem;
-import io.zoemeow.dutapi.objects.NewsGlobal;
-import io.zoemeow.dutapi.objects.NewsType;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 
+@SuppressWarnings("SpellCheckingInspection")
 public class News {
-    public static ArrayList<NewsGlobal> getNews(NewsType newsType, Integer page) {
-        ArrayList<NewsGlobal> newsList = null;
-        HttpURLConnection client = null;
-        
-        try {
-            newsList = new ArrayList<NewsGlobal>();
-            String url = "http://sv.dut.udn.vn/WebAjax/evLopHP_Load.aspx?E=%s&PAGETB=%d&COL=TieuDe&NAME=&TAB=0";
+    public static ArrayList<NewsGlobalItem> getNews(NewsType newsType, Integer page) throws Exception {
+        String url = switch (newsType) {
+            case Global -> String.format(Variables.URL_NEWS, "CTRTBSV", page);
+            case Subject -> String.format(Variables.URL_NEWS, "CTRTBGV", page);
+        };
 
-            switch (newsType) {
-                case Global:
-                    url = String.format(url, "CTRTBSV", page);
-                    break;
-                case Subject:
-                    url = String.format(url, "CTRTBGV", page);
-                    break;
-                default:
-                    // TODO: Name exception here!
-                    throw new Exception("1");
+        CustomResponse response = CustomRequest.get(null, url);
+        if (response.getReturnCode() < 200 || response.getReturnCode() >= 300)
+            throw new Exception("Server was returned with code "+ response.getReturnCode() + ".");
+
+        // https://www.baeldung.com/java-with-jsoup
+        Document webData = Jsoup.parse(response.getContentHtmlString());
+
+        // News General + News Subject
+        Elements tbBox = webData.getElementsByClass("tbbox");
+
+        ArrayList<NewsGlobalItem> newsList = new ArrayList<>();
+        for (Element tb1: tbBox) {
+            NewsGlobalItem newsItem = new NewsGlobalItem();
+
+            Element title = tb1.getElementsByClass("tbBoxCaption").get(0);
+            String[] titleTemp = title.text().split(": ");
+            Element content = tb1.getElementsByClass("tbBoxContent").get(0);
+
+            if (titleTemp.length == 2) {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                LocalDate date = LocalDate.parse(titleTemp[0], formatter);
+                LocalTime time = LocalTime.parse("00:00:00");
+                LocalDateTime dateTime = date.atTime(time);
+                newsItem.setDate(dateTime.atZone(ZoneOffset.UTC).toInstant().toEpochMilli());
+                newsItem.setTitle(titleTemp[1]);
             }
+            else newsItem.setTitle(title.text());
 
-            URL url2 = new URL(url);
-            client = (HttpURLConnection) url2.openConnection();
+            newsItem.setContent(content.html());
+            newsItem.setContentString(content.text());
 
-            // TODO: Name exception here!
-            if (client.getResponseCode() != 200 && client.getResponseCode() != 204)
-                throw new Exception("2");
-            
-            // https://stackoverflow.com/questions/8616781/how-to-get-a-web-pages-source-code-from-java
-            String inputLine;
-            StringBuilder stringBuilder = new StringBuilder();
-            try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(client.getInputStream(), "UTF-8")))
-            {
-                while ((inputLine = bufferedReader.readLine()) != null)
-                {
-                    stringBuilder.append(inputLine);
-                }
-            }
-
-            // https://www.baeldung.com/java-with-jsoup
-            Document webData = Jsoup.parse(stringBuilder.toString());
-            
-            // News General + News Subject
-            Elements tbbox = webData.getElementsByClass("tbbox");
-            for (Element tb1: tbbox) {
-                NewsGlobal newsItem = new NewsGlobal();
-
-                Element title = tb1.getElementsByClass("tbBoxCaption").get(0);
-                String[] titleTemp = title.text().split(": ");
-                Element content = tb1.getElementsByClass("tbBoxContent").get(0);
-
-                if (titleTemp.length == 2) {
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-                    newsItem.setDate(LocalDate.parse(titleTemp[0], formatter));
-                    newsItem.setTitle(titleTemp[1]);
-                }
-                else {
-                    newsItem.setTitle(title.text());
-                }
-
-                newsItem.setContent(content.html());
-                newsItem.setContentString(content.text());
-                
-                // Find links and set to item
-                ArrayList<LinkItem> links = new ArrayList<>();
-                Integer position = 0;
-                String temp1 = content.text();
-                Elements temp2 = content.getElementsByTag("a");
-                for (Element item: temp2) {
-                    if (temp1.contains(item.text())) {
-                        position = position + temp1.indexOf(item.text());
-                        links.add(new LinkItem(
+            // Find links and set to item
+            ArrayList<LinkItem> links = new ArrayList<>();
+            int position = 0;
+            String temp1 = content.text();
+            Elements temp2 = content.getElementsByTag("a");
+            for (Element item: temp2) {
+                if (temp1.contains(item.text())) {
+                    position = position + temp1.indexOf(item.text());
+                    LinkItem item1 = new LinkItem(
                             item.text(),
                             item.attr("abs:href"),
                             position
-                        ));
-                    }
+                    );
+                    links.add(item1);
                 }
-                newsItem.setLinks(links);
-
-                newsList.add(newsItem);
             }
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
+            newsItem.setLinks(links);
 
-            newsList.clear();
-            newsList = null;
+            newsList.add(newsItem);
         }
 
         return newsList;
     }
-
-
-    
 }

@@ -1,26 +1,16 @@
 package io.zoemeow.dutapi.objects;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 
-public class NewsGlobal {
-    private Integer id;
+public class NewsGlobalItem {
     private String title;
     private String content;
     private String contentString;
-    private LocalDate date;
+    private Long date;
     private ArrayList<LinkItem> links;
 
-    public NewsGlobal() {
+    public NewsGlobalItem() {
 
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public String getTitle() {
@@ -47,11 +37,11 @@ public class NewsGlobal {
         this.contentString = contentString;
     }
 
-    public LocalDate getDate() {
+    public Long getDate() {
         return date;
     }
 
-    public void setDate(LocalDate date) {
+    public void setDate(Long date) {
         this.date = date;
     }
 
