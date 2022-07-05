@@ -39,7 +39,7 @@ public class News {
             NewsGlobalItem newsItem = new NewsGlobalItem();
 
             Element title = tb1.getElementsByClass("tbBoxCaption").get(0);
-            String[] titleTemp = title.text().split(": ");
+            String[] titleTemp = title.text().split(":", 2);
             Element content = tb1.getElementsByClass("tbBoxContent").get(0);
 
             if (titleTemp.length == 2) {
@@ -48,9 +48,9 @@ public class News {
                 LocalTime time = LocalTime.parse("00:00:00");
                 LocalDateTime dateTime = date.atTime(time);
                 newsItem.setDate(dateTime.atZone(ZoneOffset.UTC).toInstant().toEpochMilli());
-                newsItem.setTitle(titleTemp[1]);
+                newsItem.setTitle(titleTemp[1].trim());
             }
-            else newsItem.setTitle(title.text());
+            else newsItem.setTitle(title.text().trim());
 
             newsItem.setContent(content.html());
             newsItem.setContentString(content.text());

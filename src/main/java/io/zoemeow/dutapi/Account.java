@@ -62,10 +62,17 @@ public class Account {
     }
 
     public static ArrayList<SubjectScheduleItem> getSubjectSchedule(String sessionId, Integer year, Integer semester) throws Exception {
-        String url = switch (semester) {
-            case 1, 2 -> String.format(Variables.URL_SUBJECTSCHEDULE, year, semester, 0);
-            case 3 -> String.format(Variables.URL_SUBJECTSCHEDULE, year, semester - 1, 1);
-            default -> throw new Exception("Invalid semester!");
+        String url = null;
+        switch (semester) {
+            case 1:
+            case 2:
+                url = String.format(Variables.URL_SUBJECTSCHEDULE, year, semester, 0);
+                break;
+            case 3:
+                String.format(Variables.URL_SUBJECTSCHEDULE, year, semester - 1, 1);
+                break;
+            default:
+                throw new Exception("Invalid semester!");
         };
 
         CustomResponse response = CustomRequest.get(
@@ -218,11 +225,19 @@ public class Account {
     }
 
     public static ArrayList<SubjectFeeItem> getSubjectFee(String sessionId, Integer year, Integer semester) throws Exception {
-        String url = switch (semester) {
-            case 1, 2 -> String.format(Variables.URL_SUBJECTFEE, year, semester, 0);
-            case 3 -> String.format(Variables.URL_SUBJECTFEE, year, semester - 1, 1);
-            default -> throw new Exception("Invalid semester!");
+        String url = null;
+        switch (semester) {
+            case 1:
+            case 2:
+                url = String.format(Variables.URL_SUBJECTSCHEDULE, year, semester, 0);
+                break;
+            case 3:
+                String.format(Variables.URL_SUBJECTSCHEDULE, year, semester - 1, 1);
+                break;
+            default:
+                throw new Exception("Invalid semester!");
         };
+
 
         CustomResponse response = CustomRequest.get(
                 sessionIdToCookie(sessionId),
