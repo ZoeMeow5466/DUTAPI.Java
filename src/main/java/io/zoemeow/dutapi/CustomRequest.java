@@ -1,10 +1,7 @@
 package io.zoemeow.dutapi;
 
 import io.zoemeow.dutapi.objects.customrequest.CustomResponse;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
+import okhttp3.*;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -15,6 +12,7 @@ public class CustomRequest {
         Request request = new Request.Builder()
                 .url(url)
                 .addHeader("Cookie", cookies != null ? cookies : "")
+                .addHeader("Content-Type", "text/html; charset=utf-8")
                 .get()
                 .build();
 
@@ -38,6 +36,7 @@ public class CustomRequest {
         OkHttpClient client = new OkHttpClient();
 
         RequestBody body = RequestBody.create(requestBytes);
+
         Request request = new Request.Builder()
                 .url(url)
                 .addHeader("Cookie", cookies != null ? cookies : "")

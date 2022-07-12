@@ -1,6 +1,8 @@
 package io.zoemeow.dutapi.objects;
 
-public class LinkItem {
+import java.io.Serializable;
+
+public class LinkItem implements Serializable {
     private String text;
     private String url;
     private Integer position;

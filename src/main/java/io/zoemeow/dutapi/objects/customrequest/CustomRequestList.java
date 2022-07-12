@@ -1,10 +1,11 @@
 package io.zoemeow.dutapi.objects.customrequest;
 
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 
-public class CustomRequestList {
+public class CustomRequestList implements Serializable {
     ArrayList<CustomRequestItem> httpRequestParameters = null;
 
     public CustomRequestList() {

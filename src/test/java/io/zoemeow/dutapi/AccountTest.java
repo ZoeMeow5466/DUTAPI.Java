@@ -10,16 +10,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 class AccountTest {
-    private Boolean makeTest = false;
-
     @Test
     void finalTest() throws Exception {
-        if (!makeTest)
-            return;
-
         String sessionId = null;
-        String user = "";
-        String pass = "";
+        String user = "102190147";
+        String pass = "cloney1301";
         Integer year = 21;
         Integer semester = 2;
 
@@ -43,12 +38,12 @@ class AccountTest {
         logout(sessionId);
     }
 
-    String initialize() throws IOException {
+    static String initialize() throws IOException {
         CustomResponse response = Account.getSessionId();
         return response.getSessionId();
     }
 
-    void login(String sessionId, String user, String pass) throws Exception {
+    static void login(String sessionId, String user, String pass) throws Exception {
         Account.login(
                 sessionId,
                 user,
@@ -61,19 +56,19 @@ class AccountTest {
         else throw new Exception("This Session ID hasn't logged in!");
     }
 
-    void getSubjectSchedule(String sessionId, Integer year, Integer semester) throws Exception {
+    static void getSubjectSchedule(String sessionId, Integer year, Integer semester) throws Exception {
         ArrayList<SubjectScheduleItem> subjectScheduleList = Account.getSubjectSchedule(sessionId, year, semester);
     }
 
-    void getSubjectFee(String sessionId, Integer year, Integer semester) throws Exception {
+    static void getSubjectFee(String sessionId, Integer year, Integer semester) throws Exception {
         ArrayList<SubjectFeeItem> subjectFeeList = Account.getSubjectFee(sessionId, year, semester);
     }
 
-    void getAccountInformation(String sessionId) throws Exception {
+    static void getAccountInformation(String sessionId) throws Exception {
         AccountInformation accInfo = Account.getAccountInformation(sessionId);
     }
 
-    void logout(String sessionId) throws Exception {
+    static void logout(String sessionId) throws Exception {
         Account.logout(sessionId);
 
         if (!Account.isLoggedIn(sessionId)) {

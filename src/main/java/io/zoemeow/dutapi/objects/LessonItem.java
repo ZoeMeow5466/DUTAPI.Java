@@ -1,6 +1,8 @@
 package io.zoemeow.dutapi.objects;
 
-public class LessonItem {
+import java.io.Serializable;
+
+public class LessonItem implements Serializable {
     private Integer start;
     private Integer end;
 

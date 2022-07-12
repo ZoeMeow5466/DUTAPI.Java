@@ -1,6 +1,8 @@
 package io.zoemeow.dutapi.objects;
 
-public class SubjectFeeItem {
+import java.io.Serializable;
+
+public class SubjectFeeItem implements Serializable {
     private String id;
     private String name;
     private Integer credit;

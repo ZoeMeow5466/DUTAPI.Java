@@ -1,6 +1,8 @@
 package io.zoemeow.dutapi.objects;
 
-public class ScheduleItem {
+import java.io.Serializable;
+
+public class ScheduleItem implements Serializable {
     private Integer dayOfWeek;
     private LessonItem lesson;
     private String room;

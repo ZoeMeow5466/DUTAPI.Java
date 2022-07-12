@@ -1,6 +1,8 @@
 package io.zoemeow.dutapi.objects;
 
-public class WeekItem {
+import java.io.Serializable;
+
+public class WeekItem implements Serializable {
     private Integer start;
     private Integer end;
 

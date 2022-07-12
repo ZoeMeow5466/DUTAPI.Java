@@ -1,6 +1,8 @@
 package io.zoemeow.dutapi.objects;
 
-public class ScheduleExam {
+import java.io.Serializable;
+
+public class ScheduleExam implements Serializable {
     private String group;
     private Boolean isGlobal;
     private Long date;

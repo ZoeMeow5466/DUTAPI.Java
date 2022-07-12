@@ -69,11 +69,11 @@ public class Account {
                 url = String.format(Variables.URL_SUBJECTSCHEDULE, year, semester, 0);
                 break;
             case 3:
-                String.format(Variables.URL_SUBJECTSCHEDULE, year, semester - 1, 1);
+                url = String.format(Variables.URL_SUBJECTSCHEDULE, year, semester - 1, 1);
                 break;
             default:
                 throw new Exception("Invalid semester!");
-        };
+        }
 
         CustomResponse response = CustomRequest.get(
                 sessionIdToCookie(sessionId),
@@ -111,7 +111,7 @@ public class Account {
                 // Set schedule study here!
                 ScheduleStudy scheduleStudy = new ScheduleStudy();
 
-                if (!cellList.get(7).text().isBlank() && !cellList.get(7).text().isEmpty()) {
+                if (!cellList.get(7).text().isEmpty()) {
                     String[] cellSplit = cellList.get(7).text().split("; ");
                     for (String cellSplitItem: cellSplit) {
                         ScheduleItem scheduleItem = new ScheduleItem();
@@ -134,7 +134,7 @@ public class Account {
                 }
 
                 // Set schedule study week list.
-                if (!cellList.get(8).text().isBlank() && !cellList.get(8).text().isEmpty()) {
+                if (!cellList.get(8).text().isEmpty()) {
                     String[] cellSplit = cellList.get(8).text().split(";");
                     for (String cellSplitItem: cellSplit) {
                         WeekItem weekItem = new WeekItem();
@@ -229,14 +229,14 @@ public class Account {
         switch (semester) {
             case 1:
             case 2:
-                url = String.format(Variables.URL_SUBJECTSCHEDULE, year, semester, 0);
+                url = String.format(Variables.URL_SUBJECTFEE, year, semester, 0);
                 break;
             case 3:
-                String.format(Variables.URL_SUBJECTSCHEDULE, year, semester - 1, 1);
+                url = String.format(Variables.URL_SUBJECTFEE, year, semester - 1, 1);
                 break;
             default:
                 throw new Exception("Invalid semester!");
-        };
+        }
 
 
         CustomResponse response = CustomRequest.get(

@@ -1,8 +1,9 @@
 package io.zoemeow.dutapi.objects;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class ScheduleStudy {
+public class ScheduleStudy implements Serializable {
     private ArrayList<ScheduleItem> scheduleList = new ArrayList<>();
     private ArrayList<WeekItem> weekList = new ArrayList<>();
     

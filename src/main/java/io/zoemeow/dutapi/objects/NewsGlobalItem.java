@@ -1,8 +1,9 @@
 package io.zoemeow.dutapi.objects;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class NewsGlobalItem {
+public class NewsGlobalItem implements Serializable {
     private String title;
     private String content;
     private String contentString;

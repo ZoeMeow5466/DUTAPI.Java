@@ -2,7 +2,9 @@ package io.zoemeow.dutapi.objects.customrequest;
 
 import io.zoemeow.dutapi.Utils;
 
-public class CustomResponse {
+import java.io.Serializable;
+
+public class CustomResponse implements Serializable {
     private Integer returnCode;
     private String contentHtmlString;
     private String sessionId;

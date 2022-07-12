@@ -14,7 +14,7 @@ class NewsTest {
     @Test
     void getNews() throws Exception {
         int page = 1;
-        int pageMax = 6;
+        int pageMax = 5;
 
         while (page <= pageMax) {
             System.out.println("==================================");
@@ -25,14 +25,14 @@ class NewsTest {
 
             for (NewsGlobalItem newsItem: newsList) {
                 System.out.println(newsItem.getDate());
-//                System.out.println(newsItem.getTitle());
-//                System.out.println(newsItem.getContent());
-//                for (LinkItem linkItem: newsItem.getLinks()) {
-//                    System.out.println("Links:");
-//                    System.out.println(" - " + linkItem.getText());
-//                    System.out.println(" - " + linkItem.getUrl());
-//                    System.out.println(" - " + linkItem.getPosition());
-//                }
+                System.out.println(newsItem.getTitle());
+                System.out.println(newsItem.getContentString());
+                for (LinkItem linkItem: newsItem.getLinks()) {
+                    System.out.println("Links:");
+                    System.out.println(" - " + linkItem.getText());
+                    System.out.println(" - " + linkItem.getUrl());
+                    System.out.println(" - " + linkItem.getPosition());
+                }
             }
             page += 1;
         }

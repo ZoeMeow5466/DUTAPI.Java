@@ -3,7 +3,7 @@ plugins {
 }
 
 group 'io.zoemeow.dutapi'
-version '1.6.1'
+version '1.6.2'
 
 repositories {
     mavenCentral()
@@ -23,6 +23,10 @@ dependencies {
 
     // https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp
     implementation 'com.squareup.okhttp3:okhttp:4.10.0'
+
+    // https://mvnrepository.com/artifact/com.squareup.okhttp/okhttp
+    implementation 'com.squareup.okhttp:okhttp:2.7.5'
+
 
 }
 

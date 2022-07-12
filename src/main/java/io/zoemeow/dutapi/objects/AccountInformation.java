@@ -1,6 +1,8 @@
 package io.zoemeow.dutapi.objects;
 
-public class AccountInformation {
+import java.io.Serializable;
+
+public class AccountInformation implements Serializable {
     private String name;
     private String dateOfBirth;
     private String birthPlace;
