@@ -4,6 +4,8 @@ This library provides API (for this repository - crawl data from a page) for acc
 
 ![https://github.com/ZoeMeow5466/DUTAPI.Java/releases/latest](https://img.shields.io/github/v/release/ZoeMeow5466/DUTAPI.Java?style=for-the-badge)
 
+You can also get this library from [here!](https://jitpack.io/#ZoeMeow5466/DUTAPI.Java/). Thanks to [JitPack.io](https://jitpack.io/) for providing it!
+
 ## Requirements for Java:
 
 - JDK (tested with Eclipse Temurin JDK with Hotspot v17.0.2).
